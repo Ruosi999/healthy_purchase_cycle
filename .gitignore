@@ -1,0 +1,24 @@
+﻿# Restricted research data
+data/
+local_data/
+outputs_local/
+
+# Local settings
+config/local.yaml
+.env
+.env.*
+
+# Python environment and cache
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+
+# R temporary files
+.Rhistory
+.RData
+.Rproj.user/
+
+# System files
+.DS_Store
+Thumbs.db
