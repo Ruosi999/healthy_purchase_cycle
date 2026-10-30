@@ -4,7 +4,7 @@
 # Preserve the original reference-card brand rules and modules 453 / 460 patch.
 # Required R packages: data.table, readr, dplyr, tibble, stringr, duckdb, DBI.
 
-RUN_YEARS <- 2008:2018L           # Examples: 2008L, 2008:2017, c(2008, 2011, 2017)
+RUN_YEARS <- 2007L           # Examples: 2008L, 2008:2017, c(2008, 2011, 2017)
 RUN_WORKERS <- 1L           # Intentionally serial: limit peak memory use.
 RUN_OVERWRITE <- FALSE      # TRUE overwrites outputs for specified years.
 CHUNK_ROWS <- 25000L       # Reduce to 25000L if memory remains tight.

@@ -16,7 +16,8 @@
 #   2. otherwise, low_fat_yogurt == 1 -> low_fat_yogurt_spending
 #   3. otherwise -> other_yogurt_spending
 # yogurt_y = 1 if ANY fat-free yogurt purchase occurs on the trip, even if
-# its net spending is zero. Other trips containing yogurt have yogurt_y = 0.
+# its net spending is zero. yogurt_y = 2 for other trips containing yogurt.
+# Trips without yogurt are absent and should have yogurt_y = NA after panel merge.
 # Unclassified types belong in 'other'; they are not assumed to be regular.
 # Coupon-adjusted net prices are floored at zero as in the FV trip pipeline.
 # Household and trip IDs stay character, preserving any leading zeros.
@@ -26,7 +27,7 @@ suppressPackageStartupMessages(library(data.table))
 
 # ---- Configuration ---------------------------------------------------------
 DATA_ROOT <- Sys.getenv("HPC_DATA_ROOT", unset =
-  "C:/Users/rwen13/Documents/healthy_purchase_data")
+                          "C:/Users/rwen13/Documents/healthy_purchase_data")
 INPUT_DIR <- file.path(DATA_ROOT, "intermediate", "yogurt_purchases")
 OUTPUT_DIR <- file.path(DATA_ROOT, "processed", "yogurt_trip_level")
 OUTPUT_FILE <- file.path(OUTPUT_DIR, "yogurt_trip_level_2008_2017.tsv")
@@ -36,7 +37,7 @@ YEAR_AUDIT_FILE <- file.path(OUTPUT_DIR, "yogurt_trip_year_audit_2008_2017.tsv")
 SOURCE_YEARS <- 2007:2018
 TARGET_YEARS <- 2008:2017
 REQUIRE_ALL_SOURCE_FILES <- FALSE # TRUE requires all 2007–2018 extracts.
-RUN_OVERWRITE <- FALSE
+RUN_OVERWRITE <- TRUE
 RUN_THREADS <- 4L
 WRITE_YEARLY_FILES <- FALSE
 setDTthreads(RUN_THREADS)
@@ -48,7 +49,7 @@ OUTPUT_COLS <- c(TRIP_KEYS, "yogurt_y", "skimmed_yogurt_spending",
 # ---- Validation / parsing --------------------------------------------------
 require_headers <- function(path, cols) {
   cols_available <- names(fread(path, nrows = 0L, sep = "\t", quote = "",
-                               showProgress = FALSE))
+                                showProgress = FALSE))
   missing <- setdiff(cols, cols_available)
   if (length(missing)) stop("Missing column(s) in ", path, ": ",
                             paste(missing, collapse = ", "))
@@ -88,8 +89,8 @@ parse_flag <- function(x, column_name, path) {
 # ---- Aggregate one annual extract -----------------------------------------
 aggregate_file <- function(source_year, path) {
   header <- require_headers(path, c("household_code", "trip_code_uc",
-                                     "purchase_date", "final_price_paid",
-                                     "fat_free_yogurt", "low_fat_yogurt"))
+                                    "purchase_date", "final_price_paid",
+                                    "fat_free_yogurt", "low_fat_yogurt"))
   # Read only six columns instead of the full purchase-level yogurt output.
   dt <- fread(path, select = c("household_code", "trip_code_uc",
                                "purchase_date", "final_price_paid",
@@ -106,30 +107,30 @@ aggregate_file <- function(source_year, path) {
   retained_rows <- sum(in_window)
   dt <- dt[in_window]
   dates <- dates[in_window]
-
+  
   if (!nrow(dt)) {
     audit <- data.table(source_year, input_rows, missing_date_rows,
                         retained_rows = 0L, trip_rows = 0L, skimmed_trips = 0L,
                         missing_price_rows = 0L, negative_price_rows = 0L)
     return(list(trips = NULL, audit = audit))
   }
-
+  
   if (anyNA(dt$household_code) || any(dt$household_code == "") ||
       anyNA(dt$trip_code_uc) || any(dt$trip_code_uc == "")) {
     stop("Missing household_code/trip_code_uc in: ", path)
   }
-
+  
   dt[, `:=`(hhid = household_code, trip_id = trip_code_uc,
             purchase_date = format(dates, "%Y-%m-%d"),
             panel_year = as.integer(format(dates, "%Y")))]
-
+  
   fat <- parse_flag(dt$fat_free_yogurt, "fat_free_yogurt", path)
   low <- parse_flag(dt$low_fat_yogurt, "low_fat_yogurt", path)
   if (any(fat == 1L & low == 1L)) {
     warning("Both fat-free and low-fat flags are 1 in ", basename(path),
             "; classifying these purchases as fat-free only.")
   }
-
+  
   spend <- suppressWarnings(as.numeric(dt$final_price_paid))
   if (any(!is.na(dt$final_price_paid) & is.na(spend))) {
     stop("Non-numeric final_price_paid value in: ", path)
@@ -139,7 +140,7 @@ aggregate_file <- function(source_year, path) {
   negative_price_rows <- sum(spend < 0, na.rm = TRUE)
   spend[is.na(spend)] <- 0
   spend <- pmax(spend, 0)
-
+  
   # Exclusive priority: fat-free > low-fat > other; each row contributes once.
   dt[, `:=`(
     skim_piece = fifelse(fat == 1L, spend, 0),
@@ -148,20 +149,20 @@ aggregate_file <- function(source_year, path) {
     skim_flag = fat
   )]
   stopifnot(isTRUE(all.equal(sum(spend), sum(dt$skim_piece) +
-                             sum(dt$low_piece) + sum(dt$other_piece),
+                               sum(dt$low_piece) + sum(dt$other_piece),
                              tolerance = 1e-10)))
-
+  
   # Group by the complete stable trip key, not just trip_id or source year.
   trips <- dt[, .(
-    yogurt_y = as.integer(any(skim_flag == 1L)),
+    yogurt_y = if (any(skim_flag == 1L)) 1L else 2L,
     skimmed_yogurt_spending = sum(skim_piece),
     low_fat_yogurt_spending = sum(low_piece),
     other_yogurt_spending = sum(other_piece)
   ), by = TRIP_KEYS]
-
+  
   audit <- data.table(source_year, input_rows, missing_date_rows,
                       retained_rows, trip_rows = nrow(trips),
-                      skimmed_trips = sum(trips$yogurt_y),
+                      skimmed_trips = sum(trips$yogurt_y == 1L),
                       missing_price_rows, negative_price_rows)
   list(trips = trips, audit = audit)
 }
@@ -180,7 +181,7 @@ run_yogurt_trip <- function() {
   }
   available_idx <- which(file.exists(paths))
   if (!length(available_idx)) stop("No yogurt purchase files found in ", INPUT_DIR)
-
+  
   dir.create(OUTPUT_DIR, recursive = TRUE, showWarnings = FALSE)
   partials <- vector("list", length(available_idx))
   audits <- vector("list", length(available_idx))
@@ -198,7 +199,7 @@ run_yogurt_trip <- function() {
   if (!length(partials)) stop("No yogurt purchases dated 2008–2017 were found.")
   all_trips <- rbindlist(partials, use.names = TRUE)
   rm(partials)
-
+  
   # Cross-source duplicate trip keys may indicate repeated purchase records.
   # Without purchase-line IDs, summing them risks double-counting. Fail safely.
   duplicates <- all_trips[, .N, by = TRIP_KEYS][N > 1L]
@@ -208,17 +209,21 @@ run_yogurt_trip <- function() {
     stop("A trip appears in multiple source-year files. Review ", issue_path,
          " and resolve source duplication before summing spending.")
   }
-
+  
+  # All output records contain yogurt; 0 and NA are reserved for neither state.
+  stopifnot(!anyNA(all_trips$yogurt_y),
+            all(all_trips$yogurt_y %in% c(1L, 2L)))
   setcolorder(all_trips, OUTPUT_COLS)
   setorder(all_trips, panel_year, hhid, purchase_date, trip_id)
   year_audit <- all_trips[, .(
     n_trips = .N,
-    n_skimmed_trips = sum(yogurt_y),
+    n_skimmed_trips = sum(yogurt_y == 1L),
+    n_other_yogurt_trips = sum(yogurt_y == 2L),
     skimmed_yogurt_spending = sum(skimmed_yogurt_spending),
     low_fat_yogurt_spending = sum(low_fat_yogurt_spending),
     other_yogurt_spending = sum(other_yogurt_spending)
   ), by = panel_year][order(panel_year)]
-
+  
   # Atomic main output; no partially-written production file on processing error.
   temporary <- paste0(OUTPUT_FILE, ".partial")
   if (file.exists(temporary)) unlink(temporary)
@@ -226,7 +231,7 @@ run_yogurt_trip <- function() {
   fwrite(all_trips, temporary, sep = "\t", na = "")
   if (file.exists(OUTPUT_FILE)) unlink(OUTPUT_FILE)
   if (!file.rename(temporary, OUTPUT_FILE)) stop("Could not finalize ", OUTPUT_FILE)
-
+  
   fwrite(rbindlist(audits), AUDIT_FILE, sep = "\t", na = "")
   fwrite(year_audit, YEAR_AUDIT_FILE, sep = "\t", na = "")
   if (WRITE_YEARLY_FILES) {
@@ -237,6 +242,8 @@ run_yogurt_trip <- function() {
     }
   }
   message("Finished: ", nrow(all_trips), " yogurt trips. Output: ", OUTPUT_FILE)
+  message("Fat-free yogurt trips (yogurt_y = 1): ", sum(all_trips$yogurt_y == 1L))
+  message("Other yogurt trips (yogurt_y = 2): ", sum(all_trips$yogurt_y == 2L))
   invisible(year_audit)
 }
 

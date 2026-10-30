@@ -1,0 +1,15 @@
+### Step 2. Demographic Data Cleaning and Household Exclusions
+
+Annual household demographics were obtained from the NielsenIQ Consumer Panel and aligned to the corresponding calendar years. Based on NielsenIQ's survey timing, general demographic characteristics were assigned to the preceding calendar year, while household income was assigned two years earlier.
+
+To ensure consistency in household demographic trajectories, we excluded households meeting any of the following criteria:
+
+1. **Age inconsistency:** Households exhibiting a decrease in the reported age or age category of either household head across adjacent years.
+2. **Marital status instability:** Households exhibiting a reversal in marital status across three consecutive years (e.g., unmarried → married → unmarried, or vice versa).
+3. **Children status instability:** Households exhibiting a temporary disappearance and reappearance of children across three consecutive years (children present → no children → children present).
+
+These exclusion rules were applied at the household level: if a household met any criterion, all its observations were removed. Only consecutive calendar years were used to identify demographic inconsistencies. Households satisfying multiple criteria were counted only once in the total number of excluded households.
+
+The final cleaned demographic panel retains the original demographic variables, constructed controls, and household-level employment classifications for subsequent life-event construction and HMM estimation.
+
+Households from step2: 499766

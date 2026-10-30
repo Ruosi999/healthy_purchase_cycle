@@ -24,13 +24,15 @@
 #   - household_code and trip_code_uc are always read and retained as character.
 #   - hhid = household_code
 #   - trip_id = trip_code_uc
-#   - milk_y = 1 if at least one fully skimmed milk purchase occurs on the trip.
+#   - milk_y = 1 if fully skimmed milk is purchased, otherwise 2 for milk trips.
+#     No-milk trips are absent here and receive NA only in the final panel.
 #   - Spending uses final_price_paid when available; otherwise it is calculated
 #     as total_price_paid - coupon_value, with missing coupons treated as zero.
-#   - low_fat_milk_spending follows the existing low_fat_milk label. Because
-#     fully skimmed milk is a subset of low-fat milk in the labeling rules,
-#     low_fat_milk_spending includes skimmed purchases and overlaps with
-#     skimmed_milk_spending by design.
+#   - Spending categories are mutually exclusive and exhaustive:
+#       skimmed: fully_skimmed_milk == 1;
+#       low-fat: low_fat_milk == 1 and fully_skimmed_milk != 1;
+#       other: all remaining milk purchases (including whole or unclassified).
+#   - milk_y = 1 for any fully skimmed milk; 2 for milk without skimmed milk.
 #
 # The script reads one source year at a time to limit memory use.
 # =============================================================================
@@ -81,9 +83,9 @@ parse_purchase_date <- function(x) {
   # Parse common Nielsen date formats without relying on the source filename.
   x <- trimws(as.character(x))
   x[x %in% c("", "NA", "N/A", "NULL")] <- NA_character_
-
+  
   parsed <- suppressWarnings(as.IDate(x, format = "%Y-%m-%d"))
-
+  
   remaining <- which(is.na(parsed) & !is.na(x))
   date_formats <- c(
     "%m/%d/%Y",
@@ -91,24 +93,24 @@ parse_purchase_date <- function(x) {
     "%Y/%m/%d",
     "%Y%m%d"
   )
-
+  
   for (date_format in date_formats) {
     if (length(remaining) == 0L) {
       break
     }
-
+    
     candidate <- suppressWarnings(
       as.IDate(x[remaining], format = date_format)
     )
     valid <- !is.na(candidate)
-
+    
     if (any(valid)) {
       parsed[remaining[valid]] <- candidate[valid]
     }
-
+    
     remaining <- which(is.na(parsed) & !is.na(x))
   }
-
+  
   parsed
 }
 
@@ -130,7 +132,7 @@ read_labeled_milk_file <- function(file_path) {
       showProgress = FALSE
     )
   )
-
+  
   required_columns <- c(
     "household_code",
     "trip_code_uc",
@@ -139,7 +141,7 @@ read_labeled_milk_file <- function(file_path) {
     "low_fat_milk",
     "fully_skimmed_milk"
   )
-
+  
   missing_columns <- setdiff(required_columns, header)
   if (length(missing_columns) > 0L) {
     stop(
@@ -147,12 +149,12 @@ read_labeled_milk_file <- function(file_path) {
       paste(missing_columns, collapse = ", ")
     )
   }
-
+  
   price_columns <- intersect(
     c("final_price_paid", "total_price_paid", "coupon_value"),
     header
   )
-
+  
   if (!("final_price_paid" %in% price_columns) &&
       !("total_price_paid" %in% price_columns)) {
     stop(
@@ -160,13 +162,13 @@ read_labeled_milk_file <- function(file_path) {
       basename(file_path)
     )
   }
-
+  
   selected_columns <- unique(c(required_columns, price_columns))
   character_columns <- intersect(
     c("household_code", "trip_code_uc", "purchase_date"),
     selected_columns
   )
-
+  
   dt <- fread(
     file_path,
     sep = "\t",
@@ -174,12 +176,12 @@ read_labeled_milk_file <- function(file_path) {
     colClasses = list(character = character_columns),
     showProgress = TRUE
   )
-
+  
   # Defensive conversion keeps trip and household identifiers as strings.
   dt[, household_code := as.character(household_code)]
   dt[, trip_code_uc := as.character(trip_code_uc)]
   dt[, purchase_date := parse_purchase_date(purchase_date)]
-
+  
   # Use the supplied coupon-adjusted price when available. If it is missing,
   # fall back to total price less coupon where those source fields are present.
   if ("final_price_paid" %in% names(dt)) {
@@ -187,29 +189,29 @@ read_labeled_milk_file <- function(file_path) {
   } else {
     spend <- rep(NA_real_, nrow(dt))
   }
-
+  
   if ("total_price_paid" %in% names(dt)) {
     total_spend <- suppressWarnings(as.numeric(dt[["total_price_paid"]]))
-
+    
     if ("coupon_value" %in% names(dt)) {
       coupon <- suppressWarnings(as.numeric(dt[["coupon_value"]]))
       coupon[is.na(coupon)] <- 0
     } else {
       coupon <- rep(0, nrow(dt))
     }
-
+    
     fallback_spend <- total_spend - coupon
     fill_rows <- is.na(spend) & !is.na(fallback_spend)
     spend[fill_rows] <- fallback_spend[fill_rows]
   }
-
+  
   dt[, spend := spend]
-
+  
   # Unrecognized or missing label values are treated as not labeled.
   dt[, whole_flag := to_binary(whole_milk)]
   dt[, low_fat_flag := to_binary(low_fat_milk)]
   dt[, skimmed_flag := to_binary(fully_skimmed_milk)]
-
+  
   dt
 }
 
@@ -220,7 +222,7 @@ aggregate_one_source_file <- function(source_year) {
     INPUT_DIR,
     paste0("milk_purchases_", source_year, "_with_labels.tsv")
   )
-
+  
   if (!file.exists(input_file)) {
     message("Skipping missing source file: ", basename(input_file))
     return(list(
@@ -238,24 +240,24 @@ aggregate_one_source_file <- function(source_year) {
       )
     ))
   }
-
+  
   message("Reading source year ", source_year, ": ", basename(input_file))
   dt <- read_labeled_milk_file(input_file)
-
+  
   input_rows <- nrow(dt)
   missing_date_rows <- sum(is.na(dt$purchase_date))
-
+  
   # panel_year is derived from the actual purchase date.
   dt[, panel_year := as.integer(format(purchase_date, "%Y"))]
-
+  
   # Reference the column explicitly outside the data.table expression.
   keep_rows <- !is.na(dt$panel_year) & dt$panel_year %in% KEEP_PANEL_YEARS
   excluded_date_rows <- sum(!keep_rows)
   dt <- dt[keep_rows]
-
+  
   if (nrow(dt) == 0L) {
     message("No in-window purchase dates in source year ", source_year)
-
+    
     return(list(
       trips = NULL,
       audit = data.table(
@@ -271,33 +273,59 @@ aggregate_one_source_file <- function(source_year) {
       )
     ))
   }
-
-  # Retain only purchase-level fields needed to construct trip-level outcomes.
-  # The low-fat spending measure follows the broad low_fat_milk label.
-  dt[, low_fat_spend_row := fifelse(low_fat_flag == 1L, spend, 0)]
-  dt[, whole_spend_row := fifelse(whole_flag == 1L, spend, 0)]
-  dt[, skimmed_spend_row := fifelse(skimmed_flag == 1L, spend, 0)]
-
-  # Aggregate all milk purchase rows to one row per household-trip-date.
+  
+  # Assign exactly one spending class per milk purchase. Fully skimmed
+  # takes precedence because it was included in the original broad low-fat flag.
+  # Whole and insufficiently classified milk are part of the "other" category.
+  dt[, milk_spending_class := fifelse(
+    skimmed_flag == 1L, "skimmed",
+    fifelse(low_fat_flag == 1L, "low_fat", "other")
+  )]
+  
+  # Verify that each retained purchase belongs to exactly one category.
+  stopifnot(!anyNA(dt$milk_spending_class))
+  dt[, skimmed_spend_row := fifelse(milk_spending_class == "skimmed", spend, 0)]
+  dt[, low_fat_spend_row := fifelse(milk_spending_class == "low_fat", spend, 0)]
+  dt[, other_spend_row := fifelse(milk_spending_class == "other", spend, 0)]
+  
+  # The categorized amounts must sum to observed net purchase spending.
+  # Missing prices contribute zero to both sides of this check, as before.
+  source_total <- sum(dt$spend, na.rm = TRUE)
+  allocated_total <- sum(dt$skimmed_spend_row, na.rm = TRUE) +
+    sum(dt$low_fat_spend_row, na.rm = TRUE) +
+    sum(dt$other_spend_row, na.rm = TRUE)
+  if (!isTRUE(all.equal(source_total, allocated_total, tolerance = 1e-8))) {
+    stop("Milk spending reconciliation failed in source year ", source_year)
+  }
+  
+  # Grouping directly assigns output key names (no duplicated column names).
   trip_data <- dt[
     ,
     .(
-      hhid = household_code[1L],
-      panel_year = panel_year[1L],
-      trip_id = trip_code_uc[1L],
-      purchase_date = purchase_date[1L],
-      milk_y = as.integer(any(skimmed_flag == 1L)),
-      low_fat_milk_spending = sum(low_fat_spend_row, na.rm = TRUE),
-      whole_milk_spending = sum(whole_spend_row, na.rm = TRUE),
+      milk_y = fifelse(any(skimmed_flag == 1L), 1L, 2L),
       skimmed_milk_spending = sum(skimmed_spend_row, na.rm = TRUE),
+      low_fat_milk_spending = sum(low_fat_spend_row, na.rm = TRUE),
+      other_milk_spending = sum(other_spend_row, na.rm = TRUE),
       purchase_rows = .N
     ),
-    by = .(household_code, panel_year, trip_code_uc, purchase_date)
+    by = .(
+      hhid = household_code,
+      panel_year,
+      trip_id = trip_code_uc,
+      purchase_date
+    )
   ]
-
+  
+  trip_total <- sum(trip_data$skimmed_milk_spending) +
+    sum(trip_data$low_fat_milk_spending) +
+    sum(trip_data$other_milk_spending)
+  if (!isTRUE(all.equal(source_total, trip_total, tolerance = 1e-8))) {
+    stop("Trip-level milk spending reconciliation failed in source year ", source_year)
+  }
+  
   # Preserve source-year provenance temporarily for duplicate checks and audits.
   trip_data[, source_file_year := as.integer(source_year)]
-
+  
   audit <- data.table(
     source_file_year = as.integer(source_year),
     input_file = basename(input_file),
@@ -309,7 +337,7 @@ aggregate_one_source_file <- function(source_year) {
     output_trip_rows = as.integer(nrow(trip_data)),
     skimmed_milk_trips = as.integer(sum(trip_data$milk_y == 1L))
   )
-
+  
   message(
     "Source year ", source_year,
     " | retained purchase rows: ", format(nrow(dt), big.mark = ","),
@@ -317,10 +345,10 @@ aggregate_one_source_file <- function(source_year) {
     " | skimmed-milk trips: ",
     format(sum(trip_data$milk_y == 1L), big.mark = ",")
   )
-
+  
   rm(dt)
   gc(verbose = FALSE)
-
+  
   list(trips = trip_data, audit = audit)
 }
 
@@ -395,9 +423,9 @@ output_columns <- c(
   "trip_id",
   "purchase_date",
   "milk_y",
+  "skimmed_milk_spending",
   "low_fat_milk_spending",
-  "whole_milk_spending",
-  "skimmed_milk_spending"
+  "other_milk_spending"
 )
 
 final_trips <- all_trips[, ..output_columns]
@@ -425,7 +453,7 @@ if (WRITE_YEARLY_FILES) {
       OUTPUT_DIR,
       paste0("milk_trip_level_", year, ".tsv")
     )
-
+    
     fwrite(yearly_data, yearly_output, sep = "\t", na = "")
     message(
       "Saved ", year, " trip-level data: ",
@@ -446,7 +474,8 @@ fwrite(audit_table, audit_output, sep = "\t", na = "")
 # Final checks and summary.
 stopifnot(
   all(final_trips$panel_year %in% KEEP_PANEL_YEARS),
-  !anyDuplicated(final_trips[, ..trip_key_columns])
+  !anyDuplicated(final_trips[, ..trip_key_columns]),
+  all(final_trips$milk_y %in% c(1L, 2L))
 )
 
 message("------------------------------------------------------------")
@@ -458,12 +487,16 @@ message(
   format(sum(final_trips$milk_y == 1L), big.mark = ",")
 )
 message(
+  "Milk trips without fully skimmed milk (milk_y = 2): ",
+  format(sum(final_trips$milk_y == 2L), big.mark = ",")
+)
+message(
   "Total low-fat milk spending: ",
   round(sum(final_trips$low_fat_milk_spending, na.rm = TRUE), 2)
 )
 message(
-  "Total whole milk spending: ",
-  round(sum(final_trips$whole_milk_spending, na.rm = TRUE), 2)
+  "Total other milk spending: ",
+  round(sum(final_trips$other_milk_spending, na.rm = TRUE), 2)
 )
 message(
   "Total skimmed milk spending: ",

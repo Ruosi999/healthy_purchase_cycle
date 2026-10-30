@@ -1,0 +1,5 @@
+                                        selection_step n_households
+                                                <char>        <int>
+1: Unique households across six categories (2008-2017)       152624
+2:   Excluded: observed in fewer than 3 distinct years        65264
+3:     Retained: observed in at least 3 distinct years        87360
