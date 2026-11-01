@@ -1,0 +1,27 @@
+{
+  "input_path": "C:\\Users\\rwen13\\Documents\\healthy_purchase_data\\processed\\hmm_input\\hmm_estimation_panel.parquet",
+  "run_mode": "full_estimation",
+  "transition_covariates": [
+    "event_new_child",
+    "getting_married",
+    "getting_divorce_or_separation",
+    "moving",
+    "getting_job",
+    "retirement"
+  ],
+  "choice_covariates": [
+    "K_1",
+    "income10k_imputed",
+    "family_size_numeric",
+    "age"
+  ],
+  "fixed_pi": 0.061403901431224546,
+  "minimum_years": 3,
+  "gap_policy": "observed_step",
+  "max_em_iters": 150,
+  "absolute_tolerance": 0.001,
+  "relative_tolerance": 1e-10,
+  "numpy_version": "2.5.3",
+  "pandas_version": "3.0.6",
+  "duckdb_version": "1.5.5"
+}

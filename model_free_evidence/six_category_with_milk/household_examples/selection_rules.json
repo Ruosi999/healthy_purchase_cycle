@@ -1,0 +1,26 @@
+{
+  "healthy_spending_columns": [
+    "fresh_spending",
+    "low_sugar_cereal_spending",
+    "skimmed_yogurt_spending",
+    "healthy_snack_spending",
+    "healthy_beverage_spending",
+    "skimmed_milk_spending"
+  ],
+  "denominator": "annual sum of trip food_spend",
+  "source_filename": "hmm_estimation_panel.parquet",
+  "year_range": [
+    2008,
+    2017
+  ],
+  "minimum_consecutive_years": 8,
+  "minimum_annual_trips": 12,
+  "minimum_annual_change_pp": 0.5,
+  "minimum_direction_reversals": 3,
+  "selection_seed": 20261031,
+  "selection": "Longest valid spell per household; qualify on reversals; prefer duration; random tie-breaks",
+  "long_spell_households": 22209,
+  "eligible_households": 18407,
+  "eligible_fraction_among_long_spells": 0.828808140843802,
+  "interpretation": "Selected descriptive examples of repeated rises and falls, not a formal test of periodicity"
+}

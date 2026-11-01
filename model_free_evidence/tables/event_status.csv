@@ -1,0 +1,7 @@
+event,status,matched_treated,unique_controls,max_control_reuse,control_effective_sample_size
+event_new_child,estimated,728,691,3,659.1840796019901
+getting_married,estimated,946,906,3,870.5408560311284
+getting_divorce_or_separation,estimated,943,913,2,886.5892323030907
+moving,estimated,1303,1262,3,1220.5672178289
+getting_job,estimated,1066,1033,3,1002.0776014109348
+retirement,estimated,1372,1227,4,1115.1563981042655

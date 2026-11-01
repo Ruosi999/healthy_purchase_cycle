@@ -1,0 +1,5 @@
+stage,households
+All households in annual panel,67480
+At least one valid year meeting trip threshold,67407
+Longest valid consecutive spell meets year threshold,22209
+Also meets direction-reversal threshold,18407

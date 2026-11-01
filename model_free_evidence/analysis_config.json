@@ -1,0 +1,52 @@
+{
+  "pipeline_version": "1.1-startup-yearwise",
+  "input_filename": "hmm_estimation_panel.parquet",
+  "include_milk": false,
+  "healthy_spending_columns": [
+    "fresh_spending",
+    "low_sugar_cereal_spending",
+    "skimmed_yogurt_spending",
+    "healthy_snack_spending",
+    "healthy_beverage_spending"
+  ],
+  "denominator": "sum of trip food_spend within household-year",
+  "year_start": 2008,
+  "year_end": 2017,
+  "event_window": [
+    -3,
+    3
+  ],
+  "reference": -1,
+  "matching": "1:1 nearest logit propensity score, with replacement, within calendar cohort",
+  "propensity_C": 1000,
+  "baseline_features": [
+    "Y_pre3",
+    "Y_pre2",
+    "Y_pre1",
+    "age",
+    "income10k_imputed",
+    "family_size_numeric",
+    "K_1"
+  ],
+  "exact_region_at_minus_one": true,
+  "caliper_pooled_logit_sd": 0.2,
+  "controls": "no focal event observed anywhere in input panel",
+  "treated": "first observed focal event; no repeat within complete event window",
+  "minimum_eligible_treated": 20,
+  "minimum_eligible_controls": 20,
+  "minimum_retained_pairs_per_cohort": 20,
+  "duplicate_trip_check": true,
+  "aggregation_mode": "auto",
+  "duckdb_threads": 4,
+  "inference": "fixed-match cohort-mean sandwich clustered by original household; G/(G-1) correction; pointwise t CIs",
+  "first_stage_uncertainty_included": false,
+  "versions": {
+    "duckdb": "1.5.5",
+    "pandas": "3.0.6",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "matplotlib": "3.11.2",
+    "pyarrow": "25.0.1"
+  }
+}
