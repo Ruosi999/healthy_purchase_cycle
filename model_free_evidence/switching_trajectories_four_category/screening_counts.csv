@@ -1,0 +1,5 @@
+stage,households
+All households,82547
+At least one valid year (>= 12 trips),81730
+Longest consecutive spell >= 8 years,22213
+Also >= 3 clear crossings,507
