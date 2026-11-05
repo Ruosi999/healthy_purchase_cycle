@@ -1,0 +1,21 @@
+panel,characteristic,value,mean,sd,purchase_incidence_pct,healthy_pct,intermediate_pct,unhealthy_pct
+Panel A. Sample Characteristics,Sample period,2008–2017,,,,,,
+Panel A. Sample Characteristics,Number of households,"82,524",,,,,,
+Panel A. Sample Characteristics,Household-year observations,"466,234",,,,,,
+Panel A. Sample Characteristics,Shopping trips,"37,606,530",,,,,,
+Panel A. Sample Characteristics,Years observed per household,5.65,,,,,,
+Panel A. Sample Characteristics,Shopping trips per household-year,80.66,,,,,,
+Panel B. Household Demographics,Age of household head (years),57.26 (12.30),57.2637,12.2980,,,,
+Panel B. Household Demographics,Household size,2.29 (1.24),2.2881,1.2428,,,,
+Panel B. Household Demographics,"Household income ($10,000)",6.21 (3.63),6.2063,3.6293,,,,
+Panel B. Household Demographics,Children under 18 (indicator),0.19 (0.39),0.1900,0.3923,,,,
+Panel C. Category-Level Purchase Behavior,Fruits & Vegetables,,,,56.5597,79.2463,,20.7537
+Panel C. Category-Level Purchase Behavior,Beverages,,,,45.4395,55.4146,,44.5854
+Panel C. Category-Level Purchase Behavior,Snacks,,,,41.9738,22.4700,,77.5300
+Panel C. Category-Level Purchase Behavior,Breakfast Cereal,,,,11.2583,10.8505,43.9877,45.1618
+Panel D. Life Events,New child,1.32%,,,,,,
+Panel D. Life Events,Marriage,1.07%,,,,,,
+Panel D. Life Events,Divorce or separation,1.16%,,,,,,
+Panel D. Life Events,Moving,3.03%,,,,,,
+Panel D. Life Events,Getting a job,1.61%,,,,,,
+Panel D. Life Events,Retirement,1.68%,,,,,,
