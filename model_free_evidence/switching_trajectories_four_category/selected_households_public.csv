@@ -1,0 +1,4 @@
+n_years,first_year,last_year,annual_range_pp,switches,tie_break,example_label
+10,2008,2017,14.54864745,6,0.410076779,Household A
+9,2009,2017,30.25753188,5,0.568265593,Household B
+10,2008,2017,25.28961072,5,0.595939178,Household C
