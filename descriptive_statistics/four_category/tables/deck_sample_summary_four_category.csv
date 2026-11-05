@@ -1,7 +1,0 @@
-variable,value,definition
-Sample period,2008–2017,Calendar years in the final estimation input
-Number of households,67492,Unique retained households
-Household-year observations,437631,Unique retained household-years
-Shopping trips,35907504,Retained estimation trips
-Years observed per household,6.484190718900018,Household-weighted mean
-Shopping trips per household-year,82.04972682465365,Household-year-weighted mean
