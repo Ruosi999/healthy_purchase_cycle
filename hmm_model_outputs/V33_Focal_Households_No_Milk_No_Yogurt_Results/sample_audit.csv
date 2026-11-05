@@ -1,0 +1,2 @@
+sample_definition,input_trips,input_households,excluded_no_focal_households,excluded_no_focal_trips,excluded_no_focal_household_years,minimum_observed_years_required,excluded_min_years_households,excluded_min_years_trips,retained_households,retained_household_years,retained_trips,retained_zero_focal_trips,retained_zero_focal_household_years,observed_year_gaps,year_gap_policy
+households with >=1 four-category purchase in 2008-2017,37606554,82547,23,24,23,1,0,0,82524,466234,37606530,2348540,749,9901,observed_step

@@ -1,5 +1,9 @@
 # V33 results
-Both models use the same retained sample and fixed initial prior. Proposed: 52 parameters; nested: 38.
+Both models use the same household-filtered sample and fixed initial prior. Proposed: 52 parameters; nested: 38.
+Eligible households make >=1 observed purchase in FV, classified cereal, snacks, or beverages over 2008--2017.
+All trips of eligible households are retained, including trips and household-years with no focal purchases.
+The household filter changes the population for incidence estimation relative to all-household V33;
+compare nested and proposed fit only within this filtered sample.
 Coefficient tables contain all free parameters, block-Hessian SEs, 95% CIs, z, p and stars.
 Stars: * p<.10, ** p<.05, *** p<.01. The fixed initial prior and nested transitions have no SEs.
 Latent-block Hessians omit missing-state information; cross-block covariance is NA, not zero.

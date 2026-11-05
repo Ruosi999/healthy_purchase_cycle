@@ -1,6 +1,7 @@
 {
   "input_path": "C:\\Users\\rwen13\\Documents\\healthy_purchase_data\\processed\\hmm_input\\hmm_estimation_panel.parquet",
   "run_mode": "full_estimation",
+  "household_eligibility": "at least one purchase in any of four focal categories over all 2008-2017 input years",
   "transition_covariates": [
     "event_new_child",
     "getting_married",
