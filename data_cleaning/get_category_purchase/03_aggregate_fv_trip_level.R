@@ -32,7 +32,7 @@ suppressPackageStartupMessages(library(data.table))
 # -----------------------------------------------------------------------------
 SOURCE_YEARS <- 2008:2018       # Include 2018 to capture 2017-dated purchases.
 TARGET_DATE_YEARS <- 2008:2017  # Final sample is selected by purchase_date year.
-RUN_OVERWRITE <- FALSE          # TRUE replaces existing output files.
+RUN_OVERWRITE <- TRUE          # TRUE replaces existing output files.
 USE_CAPPED_SPENDING <- TRUE     # TRUE: truncate negative net spending at zero.
 
 DATA_ROOT <- Sys.getenv(
