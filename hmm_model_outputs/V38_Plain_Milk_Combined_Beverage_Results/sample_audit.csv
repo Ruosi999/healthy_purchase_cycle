@@ -1,0 +1,2 @@
+input_trips,retained_trips,minimum_observed_years_required,trips_removed_by_minimum_years_filter,observed_year_gaps,year_gap_policy
+37606554,37606554,1,0,9901,observed_step

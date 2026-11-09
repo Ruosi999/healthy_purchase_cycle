@@ -1,0 +1,6 @@
+category,category_key,healthy_option,purchase_incidence_pct,healthy_pct,intermediate_pct,unhealthy_pct,category_purchase_trips,healthy_choice_trips,intermediate_choice_trips,unhealthy_choice_trips,all_estimation_trips
+Fruits & Vegetables,fv,Fresh FV,56.559708,79.246260,,20.753740,21270157,16855804,,4414353,37606554
+Yogurt,yogurt,Fat-free yogurt,12.098726,53.394416,,46.605584,4549914,2429400,,2120514,37606554
+Breakfast Cereal,cereal,Low-sugar cereal,11.258298,10.850482,43.987682,45.161836,4233858,459394,1862376.000000,1912088,37606554
+Snacks,snack,Healthy snacks,41.973769,22.469954,,77.530046,15784888,3546857,,12238031,37606554
+Beverages (including milk),beverage,Healthy drinks or any milk,59.820530,73.316614,,26.683386,22496440,16493628,,6002812,37606554

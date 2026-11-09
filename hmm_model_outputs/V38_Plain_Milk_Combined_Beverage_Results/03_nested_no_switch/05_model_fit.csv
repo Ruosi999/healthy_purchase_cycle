@@ -1,0 +1,2 @@
+model,log_likelihood,n_parameters,AIC,BIC,n_households,n_household_years,n_trips,fixed_initial_pi,converged,stop_reason,em_iterations,estimation_seconds,BIC_sample_size_definition,rank_deficient_blocks
+nested_no_switch,-134693502.71093395,46,269387097.4218679,269387526.19353086,82547,466257,37606554,0.061403901431224546,True,stable_likelihood_and_block_gradients,25,10.66013290011324,independent households,0
