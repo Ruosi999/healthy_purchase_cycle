@@ -1,0 +1,13 @@
+event,wald_chi2,df,pretrend_p_value,full_rank,series,inference_scope
+event_new_child,0.8745212811125109,2,0.6458030869970603,True,observed,fixed-match household-clustered
+event_new_child,0.09459127207007656,2,0.9538053766648957,True,model_implied,"conditional only: HMM, auxiliary fits and smoothed posteriors held fixed"
+getting_married,0.22503878338150596,2,0.8935800189131149,True,observed,fixed-match household-clustered
+getting_married,2.1064544010093136,2,0.3488102501418052,True,model_implied,"conditional only: HMM, auxiliary fits and smoothed posteriors held fixed"
+getting_divorce_or_separation,1.8787592755807838,2,0.39087024128756326,True,observed,fixed-match household-clustered
+getting_divorce_or_separation,1.1506130798578664,2,0.5625324037315277,True,model_implied,"conditional only: HMM, auxiliary fits and smoothed posteriors held fixed"
+moving,2.1441689301992968,2,0.34229427280286817,True,observed,fixed-match household-clustered
+moving,0.6991589984340306,2,0.704984473922728,True,model_implied,"conditional only: HMM, auxiliary fits and smoothed posteriors held fixed"
+getting_job,0.6787855365900111,2,0.7122026635214885,True,observed,fixed-match household-clustered
+getting_job,1.876420738010402,2,0.39132754096077627,True,model_implied,"conditional only: HMM, auxiliary fits and smoothed posteriors held fixed"
+retirement,1.4587312759511435,2,0.482214791836999,True,observed,fixed-match household-clustered
+retirement,0.4167037780444861,2,0.8119212802521609,True,model_implied,"conditional only: HMM, auxiliary fits and smoothed posteriors held fixed"

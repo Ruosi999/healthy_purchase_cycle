@@ -1,0 +1,4 @@
+sample,households,household_years,trips
+"Input, before three-year filter",82547,466257,37606554
+"Retained, three or more years",67492,437631,35907504
+Excluded by three-year filter,15055,28626,1699050

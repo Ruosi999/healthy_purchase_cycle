@@ -1,0 +1,7 @@
+event,main_did_matched_pairs,observed_spending_matched_pairs,model_spending_matched_pairs,main_did_unique_controls,pairs_dropped_for_model_coverage,identical_pair_weights
+event_new_child,730,730,730,691,0,True
+getting_married,946,946,946,913,0,True
+getting_divorce_or_separation,942,942,942,918,0,True
+moving,1302,1302,1302,1251,0,True
+getting_job,1070,1070,1070,1040,0,True
+retirement,1374,1374,1374,1234,0,True

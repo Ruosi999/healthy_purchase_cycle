@@ -1,0 +1,39 @@
+{
+  "definition": "one trip counted once if any of five categories has a healthy alternative",
+  "healthy_codes": {
+    "fv": [
+      1
+    ],
+    "yogurt": [
+      1
+    ],
+    "cereal": [
+      1,
+      2
+    ],
+    "snack": [
+      1
+    ],
+    "beverage": "original beverage_y=1 OR milk_y in (1,2)"
+  },
+  "model_results_dir": "C:\\Users\\rwen13\\Documents\\healthy_purchase_data\\processed\\hmm_input\\V42_Sugar_Choice_Bootstrap_Results_Optimized\\years_2008_2017_minHH3_observed_step",
+  "model_files": {
+    "configuration": "C:\\Users\\rwen13\\Documents\\healthy_purchase_data\\processed\\hmm_input\\V42_Sugar_Choice_Bootstrap_Results_Optimized\\years_2008_2017_minHH3_observed_step\\run_configuration.json",
+    "coefficients": "C:\\Users\\rwen13\\Documents\\healthy_purchase_data\\processed\\hmm_input\\V42_Sugar_Choice_Bootstrap_Results_Optimized\\years_2008_2017_minHH3_observed_step\\02_proposed_hmm\\01_full_coefficient_table.csv",
+    "posterior": "C:\\Users\\rwen13\\Documents\\healthy_purchase_data\\processed\\hmm_input\\V42_Sugar_Choice_Bootstrap_Results_Optimized\\years_2008_2017_minHH3_observed_step\\02_proposed_hmm\\06_posterior_household_year.csv",
+    "fit": "C:\\Users\\rwen13\\Documents\\healthy_purchase_data\\processed\\hmm_input\\V42_Sugar_Choice_Bootstrap_Results_Optimized\\years_2008_2017_minHH3_observed_step\\02_proposed_hmm\\05_model_fit.csv"
+  },
+  "model_years": [
+    2008,
+    2017
+  ],
+  "prediction": "posterior-weighted fitted probability; incidence integrated over each observed trip food_spend",
+  "simulation": "exact conditional expectations; no random draws and no model refitting",
+  "matching": "main spending-DID pairs frozen; same IDs, cohorts, reuse and weights for both rate outcomes",
+  "n_matched_household_years": 72952,
+  "n_matched_households": 10036,
+  "inference": "observed curve: fixed-match household-clustered CIs; model curve: fitted point predictions",
+  "conditional_model_standard_errors": "CSV only; hold fitted parameters and smoothed posteriors fixed",
+  "model_parameter_and_matching_uncertainty_included": false,
+  "interpretation": "within-sample fit comparison on observed histories, not an event/no-event counterfactual"
+}

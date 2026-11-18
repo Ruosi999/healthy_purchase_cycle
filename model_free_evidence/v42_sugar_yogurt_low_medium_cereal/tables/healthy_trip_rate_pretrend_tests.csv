@@ -1,0 +1,13 @@
+event,wald_chi2,df,pretrend_p_value,full_rank,series,inference_scope
+event_new_child,0.7760354508521901,2,0.6784003182228265,True,observed,fixed-match household-clustered
+event_new_child,0.9871039523789242,2,0.6104542198587548,True,model_implied,conditional only: HMM parameters and smoothed posteriors held fixed
+getting_married,2.9549479576117244,2,0.22821343287450604,True,observed,fixed-match household-clustered
+getting_married,8.97147929618858,2,0.011268549676291826,True,model_implied,conditional only: HMM parameters and smoothed posteriors held fixed
+getting_divorce_or_separation,2.5887188221452533,2,0.2740733764801352,True,observed,fixed-match household-clustered
+getting_divorce_or_separation,5.285450774601832,2,0.07116704724429061,True,model_implied,conditional only: HMM parameters and smoothed posteriors held fixed
+moving,0.48756513432233867,2,0.7836580087251992,True,observed,fixed-match household-clustered
+moving,0.4910390649182177,2,0.7822980034415161,True,model_implied,conditional only: HMM parameters and smoothed posteriors held fixed
+getting_job,0.2285035604265829,2,0.8920333312631692,True,observed,fixed-match household-clustered
+getting_job,6.167326929897001,2,0.045791194556007865,True,model_implied,conditional only: HMM parameters and smoothed posteriors held fixed
+retirement,0.15730178275494497,2,0.9243625710663521,True,observed,fixed-match household-clustered
+retirement,5.154798883465377,2,0.0759713151838402,True,model_implied,conditional only: HMM parameters and smoothed posteriors held fixed
